@@ -76,6 +76,12 @@ public class ProgramConfiguration
     public bool? IsEnabledFindSdk { get; set; } = true;
 
     /// <summary>
+    ///     Determines whether code generation is Unity compatible, for example avoiding use of C#9 function pointers
+    ///     as they are not fully supported yet.</c>.
+    /// </summary>
+    public bool? IsUnityCompatible { get; set; } = false;
+
+    /// <summary>
     ///     The bit width of the computer architecture to use when parsing C code. Default is <c>null</c>. If
     ///     <c>null</c>, the bit width of host operating system's computer architecture is used. E.g. the default for
     ///     x64 Windows is `64`. Possible values are <c>null</c>, <c>32</c> where pointers are 4 bytes, or <c>64</c>

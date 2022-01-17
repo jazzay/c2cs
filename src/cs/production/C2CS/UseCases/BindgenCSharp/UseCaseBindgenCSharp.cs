@@ -35,11 +35,7 @@ public class UseCaseBindgenCSharp : UseCase<RequestBindgenCSharp, ResponseBindge
         var codeCSharp = Step(
             "Generate C# code",
             abstractSyntaxTreeCSharp,
-            request.ClassName,
-            request.LibraryName,
-            request.NamespaceName,
-            request.HeaderCodeRegion,
-            request.FooterCodeRegion,
+            request,
             GenerateCSharpCode);
 
         Step(
@@ -87,14 +83,9 @@ public class UseCaseBindgenCSharp : UseCase<RequestBindgenCSharp, ResponseBindge
 
     private static string GenerateCSharpCode(
         CSharpAbstractSyntaxTree abstractSyntaxTree,
-        string className,
-        string libraryName,
-        string namespaceName,
-        string headerCodeRegion,
-        string footerCodeRegion)
+        RequestBindgenCSharp request)
     {
-        var codeGenerator = new CSharpCodeGenerator(
-            className, libraryName, namespaceName, headerCodeRegion, footerCodeRegion);
+        var codeGenerator = new CSharpCodeGenerator(request);
         return codeGenerator.EmitCode(abstractSyntaxTree);
     }
 

@@ -16,6 +16,7 @@ public class RequestBindgenCSharp : UseCaseRequest
         string? libraryName,
         string? @namespace,
         string? className,
+        bool unityCompatible,
         ImmutableArray<CSharpTypeAlias>? mappedTypeNames,
         ImmutableArray<string?>? ignoredTypeNames,
         string? headerCodeRegionFilePath,
@@ -30,6 +31,7 @@ public class RequestBindgenCSharp : UseCaseRequest
         IgnoredTypeNames = VerifyIgnoredTypeNames(ignoredTypeNames);
         HeaderCodeRegion = VerifyHeaderCodeRegion(headerCodeRegionFilePath);
         FooterCodeRegion = VerifyFooterCodeRegion(footerCodeRegionFilePath);
+        UnityCompatible = unityCompatible;
     }
 
     public string InputFilePath { get; }
@@ -49,6 +51,8 @@ public class RequestBindgenCSharp : UseCaseRequest
     public string HeaderCodeRegion { get; }
 
     public string FooterCodeRegion { get; }
+
+    public bool UnityCompatible { get; }
 
     private static string VerifyInputFilePath(string? inputFilePath)
     {

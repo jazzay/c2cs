@@ -21,19 +21,16 @@ public class CSharpCodeGenerator
     private readonly string _namespaceName;
     private readonly string _headerCodeRegion;
     private readonly string _footerCodeRegion;
+    private readonly bool _unityCompatible;
 
-    public CSharpCodeGenerator(
-        string className,
-        string libraryName,
-        string namespaceName,
-        string headerCodeRegion,
-        string footerCodeRegion)
+    public CSharpCodeGenerator(RequestBindgenCSharp request)
     {
-        _className = className;
-        _libraryName = libraryName;
-        _namespaceName = namespaceName;
-        _headerCodeRegion = headerCodeRegion;
-        _footerCodeRegion = footerCodeRegion;
+        _className = request.ClassName;
+        _libraryName = request.LibraryName;
+        _namespaceName = request.NamespaceName;
+        _headerCodeRegion = request.HeaderCodeRegion;
+        _footerCodeRegion = request.FooterCodeRegion;
+        _unityCompatible = request.UnityCompatible;
     }
 
     public string EmitCode(CSharpAbstractSyntaxTree abstractSyntaxTree)
@@ -202,21 +199,50 @@ public static extern {function.ReturnType.Name} {function.Name}({parameters});
     {
         foreach (var functionPointer in functionPointers)
         {
-            var member = FunctionPointer(functionPointer);
-            builder.Add(member);
+            FunctionPointer(builder, functionPointer);
         }
     }
 
-    private StructDeclarationSyntax FunctionPointer(
+    private void FunctionPointer(
+        ImmutableArray<MemberDeclarationSyntax>.Builder builder,
         CSharpFunctionPointer functionPointer, bool isNested = false)
     {
-        var parameterStrings = functionPointer.Parameters
-            .Select(x => $"{x.Type}")
-            .Append($"{functionPointer.ReturnType.Name}");
-        var parameters = string.Join(',', parameterStrings);
         var functionPointerName = functionPointer.Name;
 
-        var code = $@"
+        string code;
+        string delegateCode = "";
+        if (_unityCompatible)
+        {
+            var parameterStrings = functionPointer.Parameters.Select(x => $"{x.Type} {x.Name}");
+            var parameters = string.Join(',', parameterStrings);
+
+            code = $@"
+{functionPointer.CodeLocationComment}
+[StructLayout(LayoutKind.Sequential)]
+public struct {functionPointerName}
+{{
+	private IntPtr Pointer;
+
+    public {functionPointerName}(delegate_{functionPointerName} d) 
+    {{
+        Pointer = Marshal.GetFunctionPointerForDelegate(d);
+    }}
+}}
+";
+
+            delegateCode = $@"
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public unsafe delegate {functionPointer.ReturnType.Name} delegate_{functionPointerName}({parameters});
+";
+        }
+        else
+        {
+            var parameterStrings = functionPointer.Parameters
+                .Select(x => $"{x.Type}")
+                .Append($"{functionPointer.ReturnType.Name}");
+            var parameters = string.Join(',', parameterStrings);
+
+            code = $@"
 {functionPointer.CodeLocationComment}
 [StructLayout(LayoutKind.Sequential)]
 public struct {functionPointerName}
@@ -224,6 +250,7 @@ public struct {functionPointerName}
 	public delegate* unmanaged <{parameters}> Pointer;
 }}
 ";
+        }
 
         if (isNested)
         {
@@ -231,7 +258,18 @@ public struct {functionPointerName}
         }
 
         var member = ParseMemberCode<StructDeclarationSyntax>(code);
-        return member;
+        builder.Add(member);
+
+        if (delegateCode.Length > 0)
+        {
+            if (isNested)
+            {
+                delegateCode = delegateCode.Trim();
+            }
+
+            var delegate_member = ParseMemberCode<DelegateDeclarationSyntax>(delegateCode);
+            builder.Add(delegate_member);
+        }
     }
 
     private void Structs(

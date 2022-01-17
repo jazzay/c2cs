@@ -57,6 +57,7 @@ public static class Program
             c.LibraryName,
             c.NamespaceName,
             c.ClassName,
+            c.IsUnityCompatible.HasValue ? c.IsUnityCompatible.Value : false,
             c.MappedTypeNames,
             c.IgnoredTypeNames,
             c.HeaderCodeRegionFilePath,
