@@ -19,7 +19,7 @@ using C2CS;
 #nullable enable
 #pragma warning disable 1591
 
-public static unsafe partial class clang
+public static unsafe partial class Clang
 {
     // Enum @ Index.h:3377:6 (clang-c/Index.h)
     public enum CXCallingConv : int

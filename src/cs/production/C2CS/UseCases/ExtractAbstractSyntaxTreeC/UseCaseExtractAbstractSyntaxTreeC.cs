@@ -122,7 +122,7 @@ public class
 
         try
         {
-            NativeLibrary.SetDllImportResolver(typeof(clang).Assembly, ResolveClang);
+            NativeLibrary.SetDllImportResolver(typeof(Clang).Assembly, ResolveClang);
         }
         catch (ArgumentException)
         {
@@ -156,7 +156,7 @@ public class
         }
     }
 
-    private static clang.CXTranslationUnit Parse(
+    private static Clang.CXTranslationUnit Parse(
         string inputFilePath,
         bool automaticallyFindSoftwareDevelopmentKit,
         ImmutableArray<string> includeDirectories,
@@ -174,7 +174,7 @@ public class
     }
 
     private CAbstractSyntaxTree Explore(
-        clang.CXTranslationUnit translationUnit,
+        Clang.CXTranslationUnit translationUnit,
         ImmutableArray<string> includeDirectories,
         ImmutableArray<string> excludedHeaderFiles,
         ImmutableArray<string> opaqueTypeNames,

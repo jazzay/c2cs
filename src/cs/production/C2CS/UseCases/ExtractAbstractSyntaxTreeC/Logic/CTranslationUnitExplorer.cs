@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using static clang;
+using static Clang;
 
 namespace C2CS.UseCases.ExtractAbstractSyntaxTreeC;
 

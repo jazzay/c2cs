@@ -11,6 +11,6 @@ namespace C2CS.UseCases.ExtractAbstractSyntaxTreeC;
     PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
     GenerationMode = JsonSourceGenerationMode.Metadata)]
 [JsonSerializable(typeof(CAbstractSyntaxTree))]
-internal partial class CJsonSerializerContext : JsonSerializerContext
+internal sealed partial class CJsonSerializerContext : JsonSerializerContext
 {
 }
